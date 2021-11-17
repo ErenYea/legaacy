@@ -11,12 +11,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 from selenium.webdriver.common.proxy import Proxy, ProxyType
-import spacy
+# import spacy
 
 # load english language model
 
 
-# import undetected_chromedriver as uc
+import undetected_chromedriver as uc
 # import win32com.client as win32
 
 import os
@@ -31,7 +31,7 @@ import os
 # desired_cap["chromeOptions"] = {}
 # desired_cap["chromeOptions"]["excludeSwitches"] = ["disable-popup-blocking"]
 
-# driver = webdriver.Remote(
+# self = webdriver.Remote(
 #     command_executor='https://YOUR_USERNAME:YOUR_ACCESS_KEY@hub-cloud.browserstack.com/wd/hub',
 #     desired_capabilities=desired_cap
 #     )
@@ -51,6 +51,7 @@ class Scrape(webdriver.Chrome):
     options.add_argument("--disable-extensions")    
     options.add_argument("window-size=1200x600")
     options.add_argument("test-type")
+    options.add_argument('--disable-useAutomationExtension')
     # options.add_experimental_option('useAutomationExtension', False)
     # options.add_experimental_option("excludeSwitches", ["enable-logging"])
     options.add_argument("--disable-xss-auditor")
@@ -63,8 +64,16 @@ class Scrape(webdriver.Chrome):
     options.add_argument("--disable-notifications")
     # py = '103.205.28.238:8080'
     # py = '101.99.95.54:80'
-    capabilites = options.to_capabilities()
-    nlp = spacy.load('en_core_web_sm')
+    capabilities = options.to_capabilities()
+    # nlp = spacy.load('en_core_web_sm')
+    # capabilities = {
+    #     'browserName': 'chrome',
+    #     'chromeOptions':  {
+    #         'useAutomationExtension': False,
+    #         'forceDevToolsScreenshot': True,
+    #         'args': ['--disable-infobars','--disable-setuid-sandbox','--disable-popup-blocking','--disable-notifications','--allow-running-insecure-content','--disable-web-security','--disable-extensions']
+    #     }
+    # }
     
     # py = '136.228.141.154:80'
     # options.add_argument('--proxy-server=%s' % py)
@@ -80,7 +89,7 @@ class Scrape(webdriver.Chrome):
     # capabilities = webdriver.DesiredCapabilities.CHROME
     # prox.add_to_capabilities(capabilities)
 
-    # driver = webdriver.Chrome(desired_capabilities=capabilities)
+    # self = webdriver.Chrome(desired_capabilities=capabilities)
 
 
     # initializing the webdriver instance
@@ -94,8 +103,8 @@ class Scrape(webdriver.Chrome):
         # "proxyType":"MANUAL",
 
         # }
-        super(Scrape, self).__init__(options=self.options)
-        # self.driver = uc.Chrome(options=self.options)
+        super(Scrape, self).__init__(desired_capabilities=self.capabilities)
+        # self = uc.Chrome(options=self.options)
         self.result = {}
         self.results = {}
         self.state = None
@@ -106,6 +115,7 @@ class Scrape(webdriver.Chrome):
         self.date_to = None
         self.count = 1
         self.absPath = os.path.abspath('results.xlsx')
+        # self = uc.Chrome(options=options)
        
         # pythoncom.CoInitialize()
         # self.dff = pd.read_excel('results.xlsx')
@@ -336,20 +346,20 @@ class Scrape(webdriver.Chrome):
                 
                 self.result[s.text] = h.get_attribute('href')
                 print("\n")
-        # self.close()
+        self.close()
         
 
     def read_result(self, key):
         url = self.result[key]
-        driver = webdriver.Chrome(options=self.options)
-        
+        driver = webdriver.Chrome(desired_capabilities=self.capabilities)
+        driver.implicitly_wait(30)
         print(
             f"----------------- Extracting Data about {key} -----------------")
         print('')
         try:
             # self.get(url)
             driver.get(url)
-            driver.implicitly_wait(30)
+            # self.implicitly_wait(30)
             # try:
             #     self.ad_pop_up()
             # except Exception as e:
@@ -363,7 +373,7 @@ class Scrape(webdriver.Chrome):
                 # except Exception as e:
                 #     print(e)
                 try:
-                    paras = driver.find_element_by_xpath("//div[@data-component='ObituaryParagraph']").text.strip()
+                    # paras = self.find_element_by_xpath("//div[@data-component='ObituaryParagraph']").text.strip()
                     para = driver.find_element_by_xpath("//div[@data-component='ObituaryParagraph']").text.split('.')
                     date_of_death = '-'
                     dob = '-'
@@ -439,7 +449,7 @@ class Scrape(webdriver.Chrome):
                             funeral_home_city = '-'
                             funeral_home_state = '-'
                             funeral_home_zipcode = '-'
-
+                    
                     # try:
                     #     if date_of_death == '-':
                     #         for i in para:
@@ -573,10 +583,10 @@ class Scrape(webdriver.Chrome):
                         upcoming_service_date = '' 
                     keywords = ['Preceded', 'Survived', 'Wife', 'Husband', 'Mother', 'Father', 'Sister', 'Brother', 'civil partner', 'daughter', 'son', 'parents', 'grandparent', 'grandchild', 'parent-in-law', 'son-in-law', 'daughter-in-law', 'sister-in-law', 'brother-in-law', 'stepmother', 'step mother', 'stepfather', 'step father', 'stepchild', 'step child', 'stepsister', 'step sister', 'stepbrother', 'step brother', 'foster child', 'guardian', 'domestic partner', 'fiancé', 'fiancée', 'bride', 'dad', 'mom', 'grandchild','grandchildren', 'granddaughter', 'grandfather','granddad','grandpa', 'grandmother','grandma', 'grandson', 'great-grandparents', 'groom', 'half-brother', 'mother-in-law', 'mum','mummy','nephew', 'niece', 'twin', 'twin-brother', 'siblings']
                     lst = []
-                    about_doc = self.nlp(paras)
-                    sentences = list(about_doc.sents)
-                    for sentence in sentences:
-                        k = str(sentence).strip().lower()
+                    # about_doc = self.nlp(paras)
+                    # sentences = list(about_doc.sents)
+                    for sentence in para:
+                        k = sentence.strip().lower()
                         try:
                             if date_of_death != '-':
 
@@ -629,7 +639,7 @@ class Scrape(webdriver.Chrome):
                             if f" {self.keywords.loc[j,'Keywords'].strip().lower()}" in k:
                                 if k in lst:
                                     continue
-                                lst.append(f"{str(sentence).strip()}.\n")
+                                lst.append(f"{sentence.strip()}.\n")
                                 break
 
                     # for i in range(len(self.keywords)):
@@ -673,7 +683,7 @@ class Scrape(webdriver.Chrome):
                    
                 except Exception as e:
                     print(e)
-                    # driver.close()
+                    # self.close()
                     # with open('file.csv','a',newline="") as f:
                     #     csv_writer = csv.writer(f)
                     #     csv_writer.writerow([url])
@@ -717,15 +727,15 @@ class Scrape(webdriver.Chrome):
                         para = driver.find_elements_by_xpath('//div[@class="obit-content"]/p')
                         # lst = []
                         for i in para:
-                            about_doc = self.nlp(i.text.strip())
-                            sentences = list(about_doc.sents)
-                            for sentence in sentences:
-                                k = str(sentence).strip().lower()
+                            about_doc = i.text.strip().split('.')
+                            # sentences = list(about_doc.sents)
+                            for sentence in about_doc:
+                                k = sentence.strip().lower()
                                 for j in range(len(self.keywords)):
-                                    if f" {self.keywords.loc[j,'Keywords'].strip().lower()}" in k:
+                                    if f"{self.keywords.loc[j,'Keywords'].strip().lower()}" in k:
                                         if k in lst:
                                             continue
-                                        lst.append(f"{str(sentence).strip()}.\n")
+                                        lst.append(f"{sentence.strip()}.\n")
                                         break
                     except:
                         pass
@@ -896,7 +906,7 @@ class Scrape(webdriver.Chrome):
                     # print(f"Date of death: {date_of_death}")
                 except Exception as e:
                         print(e)
-                        # driver.close()
+                        # self.close()
                         # with open('file.csv','a',newline="") as f:
                         #     csv_writer = csv.writer(f)
                         #     csv_writer.writerow([url])
@@ -922,14 +932,14 @@ class Scrape(webdriver.Chrome):
                     for i in match:
                         date_of_death = f"{i.month}/{i.day}/{i.year}" 
                     try:
-                        data = driver.find_element_by_class_name('obitBody')
+                        data = self.find_element_by_class_name('obitBody')
                     except:
                         try:
-                            data = driver.find_element_by_class_name('obit-content')
+                            data = self.find_element_by_class_name('obit-content')
                         except:
                             try:
-                                driver.find_element_by_class_name('read-more').click()
-                                data = driver.find_element_by_id('obit-text')
+                                self.find_element_by_class_name('read-more').click()
+                                data = self.find_element_by_id('obit-text')
                             except:
                                 print("not found")
                     keywords = ['Preceded', 'Survived', 'Wife', 'Husband', 'Mother', 'Father', 'Sister', 'Brother', 'civil partner', 'daughter', 'son', 'parents', 'grandparent', 'grandchild', 'parent-in-law', 'son-in-law', 'daughter-in-law', 'sister-in-law', 'brother-in-law', 'stepmother', 'step mother', 'stepfather', 'step father', 'stepchild', 'step child', 'stepsister', 'step sister', 'stepbrother', 'step brother', 'foster child', 'guardian', 'domestic partner', 'fiancé', 'fiancée', 'bride', 'dad', 'mom', 'grandchild','grandchildren', 'granddaughter', 'grandfather','granddad','grandpa', 'grandmother','grandma', 'grandson', 'great-grandparents', 'groom', 'half-brother', 'mother-in-law', 'mum','mummy','nephew', 'niece', 'twin', 'twin-brother', 'siblings']
@@ -989,7 +999,7 @@ class Scrape(webdriver.Chrome):
                     except:
                         print('not found')
                         try:
-                            services = self.find_elements_by_class_name('service')
+                            services = driver.find_elements_by_class_name('service')
                             service_name = []
                             service_date= []
                             service_city = []
@@ -1106,7 +1116,7 @@ class Scrape(webdriver.Chrome):
 #     servicess.append(i.text.strip())     
                 except Exception as e:
                     print(e)
-            elif 'heavenlygatefuneralservices.com' in driver.current_url or 'owensbrumley.com' in driver.current_url or 'proctorsmortuary.com' in driver.current_url or 'texarkanafuneralhome.com' in driver.current_url or 'parker-ashworthfuneralhome.com' in driver.current_url or 'sneedfuneralchapel.com' in driver.current_url or 'hurleyfuneralhome.com' in driver.current_url or 'hillcrestfuneralhomelittlefield.com' in driver.current_url or 'internationalfuneralhomes.com' in driver.current_url or 'hughesfunerals.com' in driver.current_url or 'canonfuneralhome.com' in driver.current_url or 'parker-ashworthfuneralhome.com' in driver.current_url or 'cokerfuneralhome.com' in driver.current_url or 'sneedfuneralchapel.com' in driver.current_url or 'owensbrumley.com' in driver.current_url or 'billdeberry.com' in driver.current_url or 'bastropprovidencefuneralhome.com' in driver.current_url or 'comeauxchapel.com' in driver.current_url or 'internationalfuneralhomes.com' in driver.current_url or'acreswestfuneral.com' in driver.current_url or 'wisefuneralhome.com' in driver.current_url:
+            elif 'heavenlygatefuneralservices.com' in driver.current_url or 'owensbrumley.com' in driver.current_url or 'proctorsmortuary.com' in driver.current_url or 'texarkanafuneralhome.com' in driver.current_url or 'parker-ashworthfuneralhome.com' in driver.current_url or 'sneedfuneralchapel.com' in driver.current_url or 'hurleyfuneralhome.com' in driver.current_url or 'hillcrestfuneralhomelittlefield.com' in driver.current_url or 'internationalfuneralhomes.com' in driver.current_url or 'hughesfunerals.com' in driver.current_url or 'canonfuneralhome.com' in driver.current_url or 'parker-ashworthfuneralhome.com' in driver.current_url or 'cokerfuneralhome.com' in driver.current_url or 'sneedfuneralchapel.com' in driver.current_url or 'owensbrumley.com' in driver.current_url or 'billdeberry.com' in self.current_url or 'bastropprovidencefuneralhome.com' in driver.current_url or 'comeauxchapel.com' in driver.current_url or 'internationalfuneralhomes.com' in driver.current_url or'acreswestfuneral.com' in driver.current_url or 'wisefuneralhome.com' in driver.current_url:
                 try:
                     a = driver.find_element_by_class_name('text-container').text.split('\n')
                     name = a[0]
@@ -1197,7 +1207,7 @@ class Scrape(webdriver.Chrome):
                         # rows = {'State': self.state, 'City': self.city, 'Range of Dates from:': self.date_from, 'Range of Dates to:': self.date_to, 'FULL NAME OF THE DECEASED PERSON WITHOUT COMMAS': name, 'FULL NAME OF THE DECEASED PERSON WITH COMMAS': '-', 'YEAR OF BIRTH': year_of_birth, 'YEAR OF DEATH': year_of_death, 'DATE OF DEATH': date_of_death, 'Funeral Home Name': '-',
                         #         'Funeral Home Street Address': '-', 'Funeral Home City': '-', 'Funeral Home State': '-', 'Funeral Home ZIP Code': '-', 'Upcoming Service Name': '\n'.join(service_name), 'Upcoming Service Date': '\n'.join(service_date), 'Upcoming Service City': '\n'.join(service_city), 'List of Next of Kin': '\n'.join(lst), 'Link to the deceased person': url}
                         # self.df.append(rows,ignore_index=True)
-                        data = [self.state,self.city,self.date_from,self.date_from,name,'-',year_of_birth,year_of_death,date_of_death,'-','-','-','-','-','\n'.join(service_name),'\n'.join(service_date),'\n'.join(service_city),'\n'.join(lst),driver.current_driver.current_url]
+                        data = [self.state,self.city,self.date_from,self.date_from,name,'-',year_of_birth,year_of_death,date_of_death,'-','-','-','-','-','\n'.join(service_name),'\n'.join(service_date),'\n'.join(service_city),'\n'.join(lst),driver.current_url]
                         with open('results.csv','a',newline='') as f:
                             csv_writer = csv.writer(f)
                             csv_writer.writerow(data)
@@ -1411,7 +1421,7 @@ class Scrape(webdriver.Chrome):
                 try:
                     funeralservices = driver.find_elements_by_xpath('//div[@id="services-glider"]/div/div/div')
                     if len(funeralservices) == 0:
-                        data = [self.state,self.city,self.date_from,self.date_from,name,'-',year_of_birth,year_of_death,date_of_death,'-','-',city,state,'-','-','-','-','\n'.join(lst),url]
+                        data = [self.state,self.city,self.date_from,self.date_from,name,'-',year_of_birth,year_of_death,date_of_death,'-','-',city,state,'-','-','-','-','\n'.join(lst),driver.current_url]
                         with open('results.csv','a',newline='') as f:
                             csv_writer = csv.writer(f)
                             csv_writer.writerow(data)

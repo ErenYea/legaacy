@@ -11,8 +11,8 @@ inst = Scrape()
 inst.land_on_first_page()
 
 try:
-    # inst.ad_pop_up()
-    inst.click_on_popup()
+    inst.ad_pop_up()
+    # inst.click_on_popup()
 except Exception as e:
     print(e)
     
@@ -36,8 +36,8 @@ for i in range(len(df)) :
     
             
     try:
-        # inst.ad_pop_up()
-        inst.click_on_popup()
+        inst.ad_pop_up()
+        # inst.click_on_popup()
     except Exception as e:
         print(e)
     
@@ -114,6 +114,6 @@ for i in range(len(df)) :
 #     inst.runscrapper()
 print("Result got")
 # inst.df.to_excel('results.xlsx')
-inst.close()
+# inst.close()
 # inst.wb.SaveAs('cell_color.xlsx')
 # inst.df.to_excel(r'result.xlsx', index = False)
