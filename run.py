@@ -11,8 +11,8 @@ inst = Scrape()
 inst.land_on_first_page()
 
 try:
-    inst.ad_pop_up()
-    # inst.click_on_popup()
+    # inst.ad_pop_up()
+    inst.click_on_popup()
 except Exception as e:
     print(e)
     
@@ -36,8 +36,8 @@ for i in range(len(df)) :
     
             
     try:
-        inst.ad_pop_up()
-        # inst.click_on_popup()
+        # inst.ad_pop_up()
+        inst.click_on_popup()
     except Exception as e:
         print(e)
     
@@ -55,6 +55,7 @@ for i in range(len(df)) :
     elif result_cond == 'less than 10':
         inst.result_to_csv()
         inst.runscrapper()
+        inst.checkerror()
     elif result_cond == 'Didnot':
         inst.count += 1
         rows = {'State': inst.state, 'City': inst.city, 'Range of Dates from:': inst.date_from, 'Range of Dates to:': inst.date_to, 'FULL NAME OF THE DECEASED PERSON WITHOUT COMMAS': "No Result", 'FULL NAME OF THE DECEASED PERSON WITH COMMAS': '-', 'YEAR OF BIRTH': '-', 'YEAR OF DEATH': '-', 'DATE OF DEATH': '-', 'Funeral Home Name': '-',
@@ -70,6 +71,7 @@ for i in range(len(df)) :
         inst.scrolldown()
         inst.result_to_csv()
         inst.runscrapper()
+        inst.checkerror()
 
 # else:
 #     print('*******************************************************************')
